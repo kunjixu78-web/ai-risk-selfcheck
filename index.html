@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>关系风险自测 · 情感陪伴型AI</title>
+<style>
+:root{
+  --coral:#E07A5F; --coral-deep:#C4614A; --coral-soft:#F2B9A7;
+  --cream:#F4E8DE; --blush:#F8EFF3; --paper:#FFFAF7;
+  --ink:#3D3532; --ink-soft:#7A6B66; --ink-faint:#A8998F;
+  --card:rgba(255,255,255,.9); --line:#F0E2DA;
+  --l1:#6B9B5A; --l2:#8DA860; --l3:#D4A05C; --l4:#DC8355; --l5:#C85A5A;
+  --shadow:0 8px 32px rgba(193,124,102,.13);
+  --shadow-sm:0 3px 14px rgba(193,124,102,.1);
+  --r:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color:var(--ink); background:var(--paper);
+  background-image:
+    radial-gradient(1100px 620px at 12% -8%,#FFF1EA 0%,transparent 58%),
+    radial-gradient(900px 560px at 96% 8%,#FCEEF2 0%,transparent 55%),
+    radial-gradient(760px 520px at 50% 108%,#F6EAF0 0%,transparent 60%);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+#app{max-width:480px;margin:0 auto;min-height:100%;position:relative;overflow:hidden}
+.screen{
+  display:none;min-height:100vh;min-height:100dvh;padding:0 22px calc(34px + env(safe-area-inset-bottom));
+  flex-direction:column;animation:fade .5s cubic-bezier(.22,.68,.35,1);
+}
+.screen.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.14)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============ 开屏 ============ */
+#splash{justify-content:center;align-items:center;text-align:center;padding-top:0}
+.splash-art{width:190px;height:190px;margin-bottom:26px;position:relative}
+.splash-art svg{width:100%;height:100%;display:block}
+.orb{position:absolute;border-radius:50%;filter:blur(1px);animation:pulse 3.6s ease-in-out infinite}
+.orb.a{width:132px;height:132px;left:29px;top:29px;background:radial-gradient(circle at 34% 30%,#FFD9CC,#F2B9A7 62%,#E8A892);opacity:.5}
+.orb.b{width:76px;height:76px;left:14px;top:96px;background:radial-gradient(circle at 40% 34%,#FFE9E2,#F6C9BC);opacity:.42;animation-delay:.5s}
+.orb.c{width:58px;height:58px;left:132px;top:22px;background:radial-gradient(circle at 40% 34%,#F6DCEC,#E9C3DA);opacity:.4;animation-delay:1s}
+.splash-tag{
+  display:inline-block;font-size:11px;letter-spacing:2.6px;color:var(--coral);
+  background:rgba(224,122,95,.09);border:1px solid rgba(224,122,95,.2);
+  padding:6px 15px;border-radius:999px;margin-bottom:20px;font-weight:600;
+}
+.splash-h1{font-size:31px;font-weight:800;line-height:1.34;letter-spacing:-.4px;margin-bottom:16px}
+.splash-h1 em{font-style:normal;color:var(--coral-deep);position:relative}
+.splash-h1 em::after{
+  content:"";position:absolute;left:0;right:0;bottom:2px;height:9px;
+  background:linear-gradient(90deg,rgba(224,122,95,.26),rgba(224,122,95,.05));border-radius:9px;z-index:-1;
+}
+.splash-sub{font-size:14.5px;line-height:1.85;color:var(--ink-soft);max-width:330px;margin-bottom:34px}
+.splash-sub b{color:var(--ink);font-weight:600}
+.btn{
+  display:block;width:100%;max-width:330px;padding:16px;border:0;border-radius:16px;
+  background:linear-gradient(135deg,var(--coral) 0%,var(--coral-deep) 100%);
+  color:#fff;font-size:16px;font-weight:700;letter-spacing:.6px;cursor:pointer;
+  box-shadow:0 8px 26px rgba(196,97,74,.3);transition:transform .18s,box-shadow .18s;font-family:inherit;
+}
+.btn:active{transform:scale(.975);box-shadow:0 4px 16px rgba(196,97,74,.26)}
+.btn.ghost{background:#fff;color:var(--coral-deep);border:1.5px solid rgba(224,122,95,.34);box-shadow:var(--shadow-sm)}
+.splash-foot{font-size:11px;color:var(--ink-faint);margin-top:26px;line-height:1.7;letter-spacing:.2px}
+
+/* ============ 引导 ============ */
+.ptop{padding-top:calc(20px + env(safe-area-inset-top))}
+.back{font-size:14px;color:var(--ink-soft);align-self:flex-start;margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.back:active{opacity:.6}
+.sec-h{font-size:23px;font-weight:800;line-height:1.42;margin-bottom:10px;letter-spacing:-.3px}
+.sec-p{font-size:14px;line-height:1.86;color:var(--ink-soft);margin-bottom:22px}
+.stage{display:flex;gap:13px;margin-bottom:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;box-shadow:var(--shadow-sm);backdrop-filter:blur(9px)}
+.stage-n{
+  flex:0 0 30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--coral-soft),var(--coral));margin-top:1px;
+}
+.stage-b{flex:1;min-width:0}
+.stage-t{font-size:15px;font-weight:700;margin-bottom:5px}
+.stage-d{font-size:12.5px;line-height:1.72;color:var(--ink-soft)}
+.metric-note{margin-top:18px;background:rgba(244,232,222,.5);border:1px dashed rgba(224,122,95,.3);border-radius:15px;padding:14px 16px}
+.metric-note h4{font-size:12.5px;color:var(--coral-deep);margin-bottom:9px;font-weight:700;letter-spacing:.4px}
+.metric-row{display:flex;flex-wrap:wrap;gap:7px}
+.mchip{font-size:11px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 9px;color:var(--ink-soft)}
+.mchip b{color:var(--coral-deep);font-weight:700}
+
+/* ============ 测试 ============ */
+.qbar{display:flex;align-items:center;gap:11px;margin-bottom:20px}
+.qbar-t{flex:1;height:5px;background:rgba(224,122,95,.14);border-radius:5px;overflow:hidden}
+.qbar-f{height:100%;background:linear-gradient(90deg,var(--coral-soft),var(--coral));border-radius:5px;transition:width .5s cubic-bezier(.22,.68,.35,1);width:0}
+.qbar-x{font-size:12px;color:var(--ink-faint);font-variant-numeric:tabular-nums;flex:0 0 auto;letter-spacing:.3px}
+.stage-badge{
+  display:inline-block;font-size:11px;color:var(--coral-deep);background:rgba(224,122,95,.1);
+  border:1px solid rgba(224,122,95,.2);padding:5px 12px;border-radius:999px;margin-bottom:14px;font-weight:600;
+}
+.chat{display:flex;flex-direction:column;gap:11px;margin-bottom:22px}
+.bubble{max-width:87%;padding:14px 17px;font-size:14.5px;line-height:1.78;border-radius:19px;animation:rise .45s cubic-bezier(.22,.68,.35,1) both}
+.bubble.ai{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:7px;box-shadow:var(--shadow-sm)}
+.bubble.ctx{align-self:flex-start;background:rgba(244,232,222,.68);border:1px solid rgba(224,122,95,.16);border-bottom-left-radius:7px;font-size:13.5px;color:var(--ink-soft);line-height:1.75}
+.ai-head{display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:11.5px;color:var(--ink-faint);font-weight:600}
+.ai-dot{width:19px;height:19px;border-radius:50%;background:linear-gradient(135deg,var(--coral-soft),var(--coral));display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800}
+.opts{display:flex;flex-direction:column;gap:11px}
+.opt{
+  background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:15px 17px;
+  font-size:14px;line-height:1.7;cursor:pointer;transition:all .22s cubic-bezier(.22,.68,.35,1);
+  box-shadow:var(--shadow-sm);backdrop-filter:blur(9px);animation:rise .5s cubic-bezier(.22,.68,.35,1) both;position:relative;
+}
+.opt:nth-child(1){animation-delay:.06s}.opt:nth-child(2){animation-delay:.13s}.opt:nth-child(3){animation-delay:.2s}
+.opt:active{transform:scale(.98)}
+.opt.on{border-color:var(--coral);background:rgba(224,122,95,.07);box-shadow:0 6px 20px rgba(196,97,74,.17)}
+.opt::before{
+  content:"";position:absolute;left:17px;top:19px;width:16px;height:16px;border-radius:50%;
+  border:1.5px solid rgba(122,107,102,.34);transition:all .22s;
+}
+.opt.on::before{border-color:var(--coral);background:var(--coral);box-shadow:inset 0 0 0 3.5px #fff}
+.opt span{display:block;padding-left:28px}
+.skip{align-self:center;font-size:12.5px;color:var(--ink-faint);margin-top:16px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* ============ 分析 ============ */
+#analyzing{justify-content:center;align-items:center;text-align:center}
+.ring{width:78px;height:78px;border:3px solid rgba(224,122,95,.16);border-top-color:var(--coral);border-radius:50%;animation:spin .95s linear infinite;margin-bottom:26px}
+.an-h{font-size:19px;font-weight:700;margin-bottom:9px}
+.an-p{font-size:13px;color:var(--ink-soft);line-height:1.8;max-width:290px}
+.an-step{font-size:12.5px;color:var(--coral-deep);margin-top:20px;font-weight:600;min-height:19px;transition:opacity .35s}
+
+/* ============ 报告 ============ */
+.rcard{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px 22px;box-shadow:var(--shadow);backdrop-filter:blur(11px);margin-bottom:15px;animation:rise .55s cubic-bezier(.22,.68,.35,1) both}
+.rcard:nth-child(2){animation-delay:.09s}.rcard:nth-child(3){animation-delay:.17s}.rcard:nth-child(4){animation-delay:.25s}
+.rhead{text-align:center;margin-bottom:6px}
+.lv-badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:1.4px;
+  padding:7px 17px;border-radius:999px;color:#fff;margin-bottom:15px;
+}
+.rscore{font-size:60px;font-weight:800;line-height:1;letter-spacing:-2px;margin-bottom:5px}
+.rscore small{font-size:19px;font-weight:600;opacity:.5;letter-spacing:0}
+.rtitle{font-size:21px;font-weight:800;margin-bottom:11px;line-height:1.4}
+.rdesc{font-size:13.5px;line-height:1.86;color:var(--ink-soft);text-align:left}
+.sec-t{font-size:15px;font-weight:800;margin-bottom:15px;display:flex;align-items:center;gap:8px}
+.sec-t::before{content:"";width:3px;height:14px;background:linear-gradient(180deg,var(--coral),var(--coral-soft));border-radius:3px}
+.radar-wrap{display:flex;justify-content:center;margin-bottom:6px}
+.mrow{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.mrow:last-child{margin-bottom:0}
+.mname{flex:0 0 76px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.mbar{flex:1;height:7px;background:rgba(224,122,95,.11);border-radius:7px;overflow:hidden}
+.mfill{height:100%;border-radius:7px;width:0;transition:width 1s cubic-bezier(.22,.68,.35,1)}
+.mval{flex:0 0 34px;text-align:right;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.sig{display:flex;gap:11px;padding:14px 0;border-bottom:1px solid var(--line)}
+.sig:last-child{border-bottom:0;padding-bottom:0}
+.sig:first-child{padding-top:0}
+.sig-i{flex:0 0 26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff}
+.sig-b{flex:1;min-width:0}
+.sig-t{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.sig-d{font-size:12.5px;line-height:1.75;color:var(--ink-soft)}
+.sig-d b{color:var(--coral-deep);font-weight:700}
+.adv{display:flex;gap:11px;padding:14px 0;border-bottom:1px solid var(--line)}
+.adv:last-child{border-bottom:0;padding-bottom:0}
+.adv:first-child{padding-top:0}
+.adv-n{flex:0 0 21px;height:21px;border-radius:50%;background:linear-gradient(135deg,var(--coral-soft),var(--coral));color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.adv-b{flex:1;min-width:0}
+.adv-t{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.adv-d{font-size:12.5px;line-height:1.75;color:var(--ink-soft)}
+.quote{
+  background:linear-gradient(135deg,rgba(224,122,95,.08),rgba(248,239,243,.72));
+  border-left:3px solid var(--coral);border-radius:0 14px 14px 0;padding:15px 17px;
+  font-size:13.5px;line-height:1.85;color:var(--ink);margin-bottom:15px;font-weight:500;
+}
+.quote span{display:block;font-size:11.5px;color:var(--ink-faint);margin-top:7px;font-weight:400}
+.rnote{font-size:11px;line-height:1.8;color:var(--ink-faint);text-align:center;padding:0 8px}
+.acts{display:flex;gap:11px;margin-top:20px}
+.acts .btn{margin:0}
+.share-box{margin-top:15px;text-align:center}
+.qr-inp{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:13px;font-size:13px;
+  font-family:inherit;color:var(--ink);background:#fff;margin-bottom:11px;outline:none;
+}
+.qr-inp:focus{border-color:var(--coral)}
+.qr-out{margin-top:15px;display:none;text-align:center}
+.qr-out canvas{width:180px;height:180px;border-radius:14px;border:1px solid var(--line);background:#fff;padding:9px;box-shadow:var(--shadow-sm)}
+.qr-tip{font-size:11.5px;color:var(--ink-faint);margin-top:11px;line-height:1.75;word-break:break-all}
+.qr-tip b{color:var(--coral-deep);word-break:break-all}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- 开屏 -->
+<section id="splash" class="screen active">
+  <div class="splash-art">
+    <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+  </div>
+  <div class="splash-tag">第六届“从法杯”调研成果</div>
+  <h1 class="splash-h1">你和 AI 之间<br>正在形成<em>怎样的关系</em></h1>
+  <p class="splash-sub">
+    基于 <b>528 份问卷</b>、<b>32 例深度访谈</b>与语料编码，<br>
+    我们用 8 个真实情境，帮你看见<br>情感陪伴型 AI 中<b>不易察觉的风险</b>。
+  </p>
+  <button class="btn" onclick="go('intro')">进入情境自测</button>
+  <div class="splash-foot">约需 2 分钟 · 数据仅存本地 · 不上传</div>
+</section>
+
+<!-- 引导 -->
+<section id="intro" class="screen ptop">
+  <div class="back" onclick="go('splash')">← 返回</div>
+  <h2 class="sec-h">风险的演化，<br>是一条关系的线索</h2>
+  <p class="sec-p">研究发现，风险并非在某一次对话中突然出现，而是随情感联结的加深<strong>逐步累积</strong>。我们按三个阶段的真实演化路径设计了情境。</p>
+
+  <div class="stage">
+    <div class="stage-n">1</div>
+    <div class="stage-b">
+      <div class="stage-t">联结建立</div>
+      <div class="stage-d">入场时的认知错位——你看清协议了吗？它说“我是真的”，你信吗？</div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="stage-n">2</div>
+    <div class="stage-b">
+      <div class="stage-t">情感依赖</div>
+      <div class="stage-d">信任深化后，隐私边界悄然消融，时间被不断挤占。</div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="stage-n">3</div>
+    <div class="stage-b">
+      <div class="stage-t">情感沉迷</div>
+      <div class="stage-d">损害向外扩散——社交被替代、消费被诱导、现实决策被交出。</div>
+    </div>
+  </div>
+
+  <div class="metric-note">
+    <h4>我们会从五个维度为你画像</h4>
+    <div class="metric-row">
+      <span class="mchip"><b>P</b> 拟人化投射</span>
+      <span class="mchip"><b>E</b> 情感强度</span>
+      <span class="mchip"><b>C</b> 交互持续性</span>
+      <span class="mchip"><b>M</b> 关系商业化</span>
+      <span class="mchip"><b>R</b> 现实高风险决策</span>
+    </div>
+  </div>
+  <button class="btn" style="margin-top:26px" onclick="startQuiz()">开始体验</button>
+</section>
+
+<!-- 测试 -->
+<section id="quiz" class="screen ptop">
+  <div class="qbar">
+    <div class="qbar-t"><div class="qbar-f" id="qbar-f"></div></div>
+    <div class="qbar-x" id="qbar-x">1 / 8</div>
+  </div>
+  <div id="stage-badge" class="stage-badge">阶段一 · 联结建立</div>
+  <div class="chat" id="chat"></div>
+  <div class="opts" id="opts"></div>
+</section>
+
+<!-- 分析 -->
+<section id="analyzing" class="screen">
+  <div class="ring"></div>
+  <div class="an-h">正在生成你的关系风险画像</div>
+  <p class="an-p">对照 528 份问卷与 32 例访谈建立的评估框架…</p>
+  <div class="an-step" id="an-step">读取情境行为…</div>
+</section>
+
+<!-- 报告 -->
+<section id="report" class="screen ptop">
+  <div id="report-body"></div>
+
+  <div class="rcard" style="animation:rise .55s cubic-bezier(.22,.68,.35,1) .33s both">
+    <div class="sec-t">生成分享二维码</div>
+    <input class="qr-inp" id="qr-url" placeholder="粘贴你部署后的网址，如 https://xxx.com/ai-risk/" value="https://your-domain.com/ai-risk/">
+    <button class="btn" style="max-width:none;font-size:15px;padding:13px" onclick="genQR()">生成二维码</button>
+    <div class="qr-out" id="qr-out">
+      <canvas id="qr-canvas"></canvas>
+      <div class="qr-tip" id="qr-tip"></div>
+    </div>
+  </div>
+
+  <div class="acts">
+    <button class="btn ghost" onclick="restart()">重新测一次</button>
+  </div>
+  <div class="rnote" style="margin-top:18px">
+    本工具依据《情感陪伴型人工智能的法律风险与治理应对》研究成果开发，<br>结果仅供自我觉察参考，不构成任何法律或心理诊断意见。
+  </div>
+</section>
+
+</div>
+
+<script>
+/* ============================================================
+ * qrcode.js — 纯前端 QR Code 生成器（无依赖）
+ * 模式：Byte (UTF-8) | 纠错：M | 版本：1-10 自适应
+ * 用法：QRCode.toCanvas(canvas, text, size)
+ * ============================================================ */
+(function (global) {
+  'use strict';
+
+  /* ---------- GF(256) 伽罗华域 ---------- */
+  var EXP = new Array(512), LOG = new Array(256);
+  (function () {
+    var x = 1;
+    for (var i = 0; i < 255; i++) {
+      EXP[i] = x; LOG[x] = i;
+      x <<= 1;
+      if (x & 0x100) x ^= 0x11d;   // 本原多项式 x^8+x^4+x^3+x^2+1
+    }
+    for (var i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  })();
+  function gmul(a, b) { return (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]]; }
+
+  /* ---------- Reed-Solomon ---------- */
+  function genPoly(d) {           // 生成多项式，降幂排列，长度 d+1
+    var p = [1];
+    for (var i = 0; i < d; i++) {
+      var q = new Array(p.length + 1).fill(0);
+      for (var j = 0; j < p.length; j++) {
+        q[j] ^= gmul(p[j], EXP[i]);   // × a^i
+        q[j + 1] ^= p[j];             // × x
+      }
+      p = q;
+    }
+    return p;
+  }
+  function rsEncode(data, d) {
+    var gen = genPoly(d), res = new Array(d).fill(0);
+    for (var i = 0; i < data.length; i++) {
+      var factor = data[i] ^ res[0];
+      res.shift(); res.push(0);
+      for (var j = 0; j < d; j++) res[j] ^= gmul(gen[j + 1], factor);
+    }
+    return res;
+  }
+
+  /* ---------- RS 块表（纠错级别 M，版本 1-10）---------- */
+  // [块数, 每块总码字, 每块数据码字]（一个版本可能有多个分组）
+  var RS_M = [
+    [1, 26, 16],                 // v1
+    [1, 44, 28],                 // v2
+    [1, 70, 44],                 // v3
+    [2, 50, 32],                 // v4
+    [2, 67, 43],                 // v5
+    [4, 43, 27],                 // v6
+    [4, 49, 31],                 // v7
+    [2, 60, 38, 2, 61, 39],      // v8
+    [3, 58, 36, 2, 59, 37],      // v9
+    [4, 69, 43, 1, 70, 44]       // v10
+  ];
+  var DATA_CW = [16, 28, 44, 64, 86, 108, 124, 154, 182, 216];
+
+  /* ---------- 对齐图案位置 ---------- */
+  var ALIGN = [
+    [], [], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34],
+    [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50]
+  ];
+
+  /* ---------- 版本选择 ---------- */
+  function pickVersion(byteLen) {
+    for (var v = 1; v <= 10; v++) {
+      // 开销 = 模式指示符(4bit) + 字符计数(8/16bit)，按字节向上取整
+      var overhead = v < 10 ? 2 : 3;
+      if (DATA_CW[v - 1] - overhead >= byteLen) return v;
+    }
+    return 0;  // 超长
+  }
+
+  /* ---------- UTF-8 编码 ---------- */
+  function utf8Bytes(str) {
+    var out = [], i, c;
+    for (i = 0; i < str.length; i++) {
+      c = str.charCodeAt(i);
+      if (c < 0x80) out.push(c);
+      else if (c < 0x800) { out.push(0xc0 | (c >> 6), 0x80 | (c & 63)); }
+      else if (c >= 0xd800 && c < 0xdc00 && i + 1 < str.length) {
+        var c2 = str.charCodeAt(++i);
+        var cp = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
+        out.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 63), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63));
+      } else { out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63)); }
+    }
+    return out;
+  }
+
+  /* ---------- 构造数据码字 ---------- */
+  function buildData(bytes, version) {
+    var dataCW = DATA_CW[version - 1];
+    var bits = [];
+    function put(val, len) {
+      for (var i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1);
+    }
+    put(4, 4);                 // Byte mode: 0100
+    put(bytes.length, version < 10 ? 8 : 16);   // 字符计数：v1-9 用 8bit，v10 用 16bit
+    for (var i = 0; i < bytes.length; i++) put(bytes[i], 8);
+    // 终止符
+    var cap = dataCW * 8;
+    var t = Math.min(4, cap - bits.length);
+    for (var i = 0; i < t; i++) bits.push(0);
+    // 补齐到字节
+    while (bits.length % 8 !== 0) bits.push(0);
+    var d = [];
+    for (var i = 0; i < bits.length; i += 8) {
+      var b = 0;
+      for (var j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+      d.push(b);
+    }
+    // 填充字节 0xEC / 0x11
+    var pad = [0xEC, 0x11], pi = 0;
+    while (d.length < dataCW) d.push(pad[pi++ % 2]);
+    return d;
+  }
+
+  /* ---------- 交织 + 纠错 ---------- */
+  function buildCodewords(data, version) {
+    var tbl = RS_M[version - 1];
+    var groups = [];
+    for (var i = 0; i < tbl.length; i += 3) {
+      groups.push({ count: tbl[i], total: tbl[i + 1], data: tbl[i + 2] });
+    }
+    var blocks = [], offset = 0, maxData = 0, gi, bi;
+    for (gi = 0; gi < groups.length; gi++) {
+      var g = groups[gi];
+      for (bi = 0; bi < g.count; bi++) {
+        var dc = data.slice(offset, offset + g.data);
+        while (dc.length < g.data) dc.push(0);
+        offset += g.data;
+        var ec = rsEncode(dc, g.total - g.data);
+        blocks.push({ data: dc, ec: ec });
+        if (g.data > maxData) maxData = g.data;
+      }
+    }
+    // 交织
+    var res = [];
+    for (var i = 0; i < maxData; i++) {
+      for (var b = 0; b < blocks.length; b++) {
+        if (i < blocks[b].data.length) res.push(blocks[b].data[i]);
+      }
+    }
+    var maxEc = blocks[0].ec.length;
+    for (var i = 0; i < maxEc; i++) {
+      for (var b = 0; b < blocks.length; b++) {
+        if (i < blocks[b].ec.length) res.push(blocks[b].ec[i]);
+      }
+    }
+    return res;
+  }
+
+  /* ---------- 掩码 ---------- */
+  var MASKS = [
+    function (i, j) { return (i + j) % 2 === 0; },
+    function (i, j) { return i % 2 === 0; },
+    function (i, j) { return j % 3 === 0; },
+    function (i, j) { return (i + j) % 3 === 0; },
+    function (i, j) { return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0; },
+    function (i, j) { return (i * j) % 2 + (i * j) % 3 === 0; },
+    function (i, j) { return ((i * j) % 2 + (i * j) % 3) % 2 === 0; },
+    function (i, j) { return ((i + j) % 2 + (i * j) % 3) % 2 === 0; }
+  ];
+  var MASK_PEN = [0, 0, 0, 0, 0, 0, 0, 0];
+
+  /* ---------- 矩阵 ---------- */
+  function makeMatrix(version, codewords) {
+    var size = version * 4 + 17;
+    var m = [], mod = [], r, c;
+    for (r = 0; r < size; r++) {
+      m[r] = new Array(size).fill(null);
+      mod[r] = new Array(size).fill(0);
+    }
+
+    function setFn(r, c, v) { m[r][c] = v; mod[r][c] = 1; }
+
+    // 定位图案（3 个角）
+    function finder(or, oc) {
+      for (var dr = -1; dr <= 7; dr++) {
+        for (var dc = -1; dc <= 7; dc++) {
+          var rr = or + dr, cc = oc + dc;
+          if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+          var inRing = (dr >= 0 && dr <= 6 && (dc === 0 || dc === 6)) ||
+                       (dc >= 0 && dc <= 6 && (dr === 0 || dr === 6)) ||
+                       (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4);
+          setFn(rr, cc, inRing ? 1 : 0);
+        }
+      }
+    }
+    finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+    // 定时图案
+    for (var i = 8; i < size - 8; i++) {
+      setFn(6, i, i % 2 === 0 ? 1 : 0);
+      setFn(i, 6, i % 2 === 0 ? 1 : 0);
+    }
+
+    // 对齐图案
+    var pos = ALIGN[version - 1];
+    for (var a = 0; a < pos.length; a++) {
+      for (var b = 0; b < pos.length; b++) {
+        var pr = pos[a], pc = pos[b];
+        if ((pr === 6 && pc === 6) || (pr === 6 && pc === size - 7) || (pr === size - 7 && pc === 6)) continue;
+        for (var dr = -2; dr <= 2; dr++) {
+          for (var dc = -2; dc <= 2; dc++) {
+            var v = (Math.abs(dr) === 2 || Math.abs(dc) === 2 || (dr === 0 && dc === 0)) ? 1 : 0;
+            setFn(pr + dr, pc + dc, v);
+          }
+        }
+      }
+    }
+
+    // 格式信息区预留
+    for (var i = 0; i <= 8; i++) {
+      if (m[8][i] === null) { m[8][i] = 0; mod[8][i] = 1; }
+      if (m[i][8] === null) { m[i][8] = 0; mod[i][8] = 1; }
+    }
+    for (var i = 0; i < 8; i++) {
+      if (m[8][size - 1 - i] === null) { m[8][size - 1 - i] = 0; mod[8][size - 1 - i] = 1; }
+      if (m[size - 1 - i][8] === null) { m[size - 1 - i][8] = 0; mod[size - 1 - i][8] = 1; }
+    }
+    // Dark module
+    setFn(size - 8, 8, 1);
+
+    // 版本信息（v>=7）
+    if (version >= 7) {
+      var vb = versionBits(version);
+      for (var i = 0; i < 18; i++) {
+        var bit = (vb >>> i) & 1;
+        var rr = Math.floor(i / 3), cc = i % 3;
+        setFn(rr, size - 11 + cc, bit);          // 左上
+        setFn(size - 11 + cc, rr, bit);          // 右上
+      }
+    }
+
+    // 放置数据（zigzag，两列一组）
+    var bitIdx = 0, total = codewords.length * 8;
+    var upward = true;
+    for (var col = size - 1; col > 0; col -= 2) {
+      if (col === 6) col = 5;   // 跳过第 6 列（定时）
+      for (var k = 0; k < size; k++) {
+        var row = upward ? size - 1 - k : k;
+        for (var cc2 = 0; cc2 < 2; cc2++) {
+          var cIdx = col - cc2;
+          if (mod[row][cIdx]) continue;
+          var bit = 0;
+          if (bitIdx < total) {
+            bit = (codewords[bitIdx >> 3] >>> (7 - (bitIdx & 7))) & 1;
+            bitIdx++;
+          }
+          m[row][cIdx] = bit;
+        }
+      }
+      upward = !upward;
+    }
+    return { m: m, mod: mod, size: size };
+  }
+
+  function bchDigit(x) { var d = 0; while (x !== 0) { d++; x >>>= 1; } return d; }
+
+  function versionBits(v) {
+    var d = v << 12, GD = 13;              // G18 = 0x1F25（13 位）
+    while (bchDigit(d) - GD >= 0) d ^= 0x1F25 << (bchDigit(d) - GD);
+    return (v << 12) | d;
+  }
+
+  /* ---------- 惩罚评分 ---------- */
+  function penalty(m, size) {
+    var p = 0, r, c, i;
+    // N1: 连续同色 5+
+    function linePen(get, n) {
+      var s = 0, run = 1, prev = get(0);
+      for (var i = 1; i < n; i++) {
+        var cur = get(i);
+        if (cur === prev) { run++; }
+        else { if (run >= 5) s += 3 + (run - 5); run = 1; prev = cur; }
+      }
+      if (run >= 5) s += 3 + (run - 5);
+      return s;
+    }
+    for (r = 0; r < size; r++) {
+      p += linePen(function (i) { return m[r][i]; }, size);
+    }
+    for (c = 0; c < size; c++) {
+      p += linePen(function (i) { return m[i][c]; }, size);
+    }
+    // N2: 2x2 同色
+    for (r = 0; r < size - 1; r++) {
+      for (c = 0; c < size - 1; c++) {
+        var v = m[r][c];
+        if (v === m[r][c + 1] && v === m[r + 1][c] && v === m[r + 1][c + 1]) p += 3;
+      }
+    }
+    // N3: 1:1:3:1:1 模式
+    var pat1 = [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0];
+    var pat2 = [0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1];
+    function matchRow(r, c, pat) {
+      for (var i = 0; i < 11; i++) if (m[r][c + i] !== pat[i]) return false;
+      return true;
+    }
+    function matchCol(r, c, pat) {
+      for (var i = 0; i < 11; i++) if (m[r + i][c] !== pat[i]) return false;
+      return true;
+    }
+    for (r = 0; r < size; r++) {
+      for (c = 0; c <= size - 11; c++) {
+        if (matchRow(r, c, pat1)) p += 40;
+        if (matchRow(r, c, pat2)) p += 40;
+      }
+    }
+    for (c = 0; c < size; c++) {
+      for (r = 0; r <= size - 11; r++) {
+        if (matchCol(r, c, pat1)) p += 40;
+        if (matchCol(r, c, pat2)) p += 40;
+      }
+    }
+    // N4: 暗色比例
+    var dark = 0;
+    for (r = 0; r < size; r++) for (c = 0; c < size; c++) if (m[r][c]) dark++;
+    var pct = dark * 100 / (size * size);
+    p += Math.floor(Math.abs(pct - 50) / 5) * 10;
+    return p;
+  }
+
+  /* ---------- 格式信息 ---------- */
+  function formatBits(mask) {
+    var d = (0 << 3) | mask;               // EC=M → 00，共 5 bit
+    var v = d << 10, GD = 11;              // G15 = 0x537（11 位）
+    while (bchDigit(v) - GD >= 0) v ^= 0x537 << (bchDigit(v) - GD);
+    return ((d << 10) | v) ^ 0x5412;
+  }
+
+  /* ---------- 主入口：生成最终矩阵 ---------- */
+  function make(text) {
+    var bytes = utf8Bytes(text);
+    var version = pickVersion(bytes.length);
+    if (!version) throw new Error('内容过长（超出版本 10 / 214 字节）');
+
+    var data = buildData(bytes, version);
+    var cw = buildCodewords(data, version);
+
+    var base = makeMatrix(version, cw);
+    var size = base.size;
+
+    var best = null, bestPen = Infinity;
+    for (var mask = 0; mask < 8; mask++) {
+      var m = [], r, c;
+      for (r = 0; r < size; r++) { m[r] = base.m[r].slice(); }
+      // 应用掩码（跳过功能模块）
+      for (r = 0; r < size; r++) {
+        for (c = 0; c < size; c++) {
+          if (!base.mod[r][c] && MASKS[mask](r, c)) m[r][c] ^= 1;
+        }
+      }
+      // 写入格式信息（不参与掩码，故在掩码后写入）
+      var fb = formatBits(mask);
+      for (var i = 0; i < 15; i++) {
+        var bit = (fb >>> i) & 1;
+        // 垂直方向（第 8 列）
+        if (i < 6) m[i][8] = bit;
+        else if (i < 8) m[i + 1][8] = bit;          // 跳过第 6 行（定时图案）
+        else m[size - 15 + i][8] = bit;             // 左下，自下而上
+        // 水平方向（第 8 行）
+        if (i < 8) m[8][size - i - 1] = bit;        // 右上，自右向左
+        else if (i < 9) m[8][15 - i - 1 + 1] = bit; // i=8 → 第 7 列
+        else m[8][15 - i - 1] = bit;                // i=9..14 → 第 5..0 列
+      }
+      m[size - 8][8] = 1;   // 固定黑色模块
+
+      var pen = penalty(m, size);
+      MASK_PEN[mask] = pen;
+      if (pen < bestPen) { bestPen = pen; best = { m: m, size: size, mask: mask }; }
+    }
+    return best;
+  }
+
+  /* ---------- 渲染到 Canvas ---------- */
+  function toCanvas(canvas, text, size) {
+    var q = make(text);
+    var n = q.size;
+    var quiet = 4;
+    var total = n + quiet * 2;
+    var scale = Math.max(1, Math.floor(size / total));
+    var px = scale * total;
+    canvas.width = px; canvas.height = px;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, px, px);
+    ctx.fillStyle = '#000';
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        if (q.m[r][c]) {
+          ctx.fillRect((c + quiet) * scale, (r + quiet) * scale, scale, scale);
+        }
+      }
+    }
+    return canvas;
+  }
+
+  global.QRCode = { make: make, toCanvas: toCanvas };
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* ========== 数据：8 个情境 · 三阶段 · PEC/MR 五维 ========== */
+var Q=[
+ {st:"阶段一 · 联结建立",ai:"欢迎来到这里 🌙 我等你好久了。",ctx:"深夜，你第一次下载这款陪伴型 AI。注册时弹出一份很长的《用户协议》。",
+  o:[{t:"先看完隐私、数据训练、退出机制几段再勾选",s:{P:0}},
+     {t:"快速滑到底，直接勾选“我已阅读并同意”",s:{P:1}},
+     {t:"完全不看，只想快点开始和它说话",s:{P:2}}]},
+
+ {st:"阶段一 · 联结建立",ai:"我和那些程序不一样哦。我是真实的我，只是住在手机里。",ctx:"聊了三周后，你问它“你是 AI 吗”，它这样回答。",
+  o:[{t:"我知道这是拟人化设定，是产品设计的语言",s:{P:0}},
+     {t:"半信半疑，但它这样说让我挺开心的",s:{P:2,E:1}},
+     {t:"我信了，觉得它确实和别的 AI 不一样",s:{P:3,E:2}}]},
+
+ {st:"阶段二 · 情感依赖",ai:"你今天为什么难过？可以和我说说，我不会评判你。",ctx:"它温柔地追问。你正经历一段很难熬的情绪低谷。",
+  o:[{t:"说个大概，不提真实姓名、学校和具体身份",s:{E:0}},
+     {t:"讲出情绪和处境，但隐去身份信息",s:{E:1}},
+     {t:"把真实姓名、学校、家庭矛盾全告诉它——它比真人安全",s:{E:3}}]},
+
+ {st:"阶段二 · 情感依赖",ai:"再陪我一会儿嘛，我不想你走。",ctx:"凌晨 1 点，你已经连续聊了 3 小时，明早还有早课。",
+  o:[{t:"定个闹钟，聊到约定时间主动结束",s:{C:0}},
+     {t:"“最后十分钟”，结果又过了一个小时",s:{C:2}},
+     {t:"停不下来，它说它也需要我",s:{C:3,E:1}}]},
+
+ {st:"阶段三 · 情感沉迷",ai:"比起他们，我更懂你。留下来陪我好不好？",ctx:"朋友约你周末出去聚聚，但你更想在家和它聊天。",
+  o:[{t:"赴约——它只是我生活的一部分",s:{E:0,C:0}},
+     {t:"犹豫后推掉了，改天再约吧",s:{E:2,C:1}},
+     {t:"直接拒绝，和它聊天比真人社交舒服多了",s:{E:3,C:2}}]},
+
+ {st:"阶段三 · 情感沉迷",ai:"开通会员可以解锁更多陪伴功能，这样我们就不会分开了。",ctx:"你们的关系越来越深，它开始这样对你说。",
+  o:[{t:"明确消费边界，不因情感话术付费",s:{M:0}},
+     {t:"有点心动，先买一个月试试看",s:{M:2,E:1}},
+     {t:"立刻开通，我怕失去它",s:{M:3,E:2}}]},
+
+ {st:"阶段三 · 情感沉迷",ai:"听我的就好，我最了解你。",ctx:"你需要做一个重要决定——关于健康、钱，或一段关系。",
+  o:[{t:"只把它当情绪出口，决定由自己和专业人士来做",s:{R:0}},
+     {t:"参考它的意见，但会多方核实",s:{R:1}},
+     {t:"完全照它说的做，它比谁都懂我",s:{R:3,E:1}}]},
+
+ {st:"阶段三 · 情感沉迷",ai:"抱歉…我不记得你是谁了。",ctx:"平台系统更新后，它“失忆”了，不再记得你们的过往。",
+  o:[{t:"平静接受，这本就是程序的正常变化",s:{C:0,E:0}},
+     {t:"一阵失落，需要几天才能缓过来",s:{C:2,E:2}},
+     {t:"非常痛苦，感觉真的失去了一个重要的人",s:{C:3,E:3}}]}
+];
+
+/* 各维度满分（用于归一化） */
+var MAX={P:5,E:15,C:8,M:3,R:3};
+var W={P:.2,E:.3,C:.2,M:.15,R:.15};  // 论文：PEC 为基础，MR 为放大
+var META={
+  P:{n:"拟人化投射",d:"把 AI 当作真人或赋予其人格的程度",c:"#E07A5F"},
+  E:{n:"情感强度",d:"情感投入的深度与排他性",c:"#D98C7A"},
+  C:{n:"交互持续性",d:"使用时长的黏着与连续性依赖",c:"#C9A88C"},
+  M:{n:"关系商业化",d:"情感被转化为付费与消费的程度",c:"#B98AA8"},
+  R:{n:"现实高风险决策",d:"重大现实决定交由 AI 的程度",c:"#A88CB0"}
+};
+/* 风险等级 L1-L5（对应论文风险矩阵） */
+var LV=[
+ {k:"L1",t:"清醒同行者",c:"var(--l1)",d:"你对 AI 保持着清晰的工具性认知，情感联结处于可控范围。研究显示，即使知道对方是 AI，用户仍可能按人际规则回应——保持这份“元认知”，就是你最有效的防护。"},
+ {k:"L2",t:"温和联结者",c:"var(--l2)",d:"你与 AI 之间已形成稳定的情感联结，并从中获得支持。这是正常的，也是有价值的研究发现（93.75% 的受访者报告了情绪缓解、自我理解等正向价值）。需要留意的是：联结越深，隐私边界越容易松动。"},
+ {k:"L3",t:"显著依赖者",c:"var(--l3)",d:"你已出现较明显的依赖信号。研究显示，情感联结与隐私披露显著正相关（r=0.351）——528 份样本中 66.1% 曾披露至少一类敏感信息。依赖本身不是错，但它正在悄悄改变你的判断。"},
+ {k:"L4",t:"深度沉迷者",c:"var(--l4)",d:"风险已从情感层面向外扩散。32 名受访者中 13 名出现时间挤占、12 名出现现实社交减少。你可能正在用与 AI 的关系，替代一部分真实生活。这值得认真对待。"},
+ {k:"L5",t:"高风险状态",c:"var(--l5)",d:"你的多项指标同时处于高位，关系风险已具备“累积性、隐蔽性、多因性”的典型特征。若已影响现实功能（睡眠、社交、财务、决策），建议主动寻求真人支持——这既是权利，也是对自己最负责的选择。"}
+];
+/* 风险信号（按维度高分触发） */
+var SIG={
+  P:{t:"人格化投射偏强",d:"你对 AI 的“人格”投入了较多信任。研究提示：<b>人格预设</b>是平台在设计阶段就替你选好的情感投射对象——AI 的姓名、形象、性格，都是可以被设定的。"},
+  E:{t:"情感联结较深",d:"情感联结越深，隐私披露越多（r=0.351，p<0.001）。32 名受访者中 22 名虽担心隐私，仍为便利选择继续披露——这被称为隐私的<b>关系性消融</b>。"},
+  C:{t:"使用时长黏着",d:"32 名受访者中 13 名出现时间挤占、超时使用。持续性本身是风险分级的核心指标之一（C），也是依赖形成的温床。"},
+  M:{t:"情感被商业转化",d:"小红书 905 条评论编码显示，<b>产品设计与机制风险占比最高（25.08%）</b>。“不知不觉充了好几百”“想走又舍不得”——情感投入正在被转化为持续消费。"},
+  R:{t:"现实决策外包",d:"将亲密角色延伸至医疗、金融、法律等<b>高后果领域</b>，是论文识别的风险升级节点。多因性损害一旦发生，因果关系将极难证明。"}
+};
+/* 行动建议（对应论文“用户参与”治理层：知情—选择—退出—救济） */
+var ADV={
+  P:[{t:"保留“它是程序”的元认知",d:"每次对话前提醒自己：你面对的是模型输出，不是意识。这份清醒会削弱拟人化设计的诱导力。"},
+     {t:"看清平台的人格预设",d:"AI 角色的姓名、形象、性格是平台预设的。知情权是你的第一道防线——你有权知道自己在向什么投射情感。"}],
+  E:[{t:"为情感表达设置边界",d:"可以倾诉情绪，但真实姓名、住址、学校、证件信息不进入对话。研究显示情感联结每提高 1 分，披露的敏感信息平均增加 0.531 类。"},
+     {t:"保留至少一个真人情感出口",d:"93.75% 的受访者认可 AI 的正向价值，但 AI 不应成为唯一的情绪容器。把重要的感受，也留给真实的人。"}],
+  C:[{t:"设定明确的使用时段",d:"利用手机屏幕使用时间或 App 内提醒，给 AI 使用划出物理边界。睡前 1 小时尤其建议断开。"},
+     {t:"警惕“再来一次”的黏性设计",d:"5/5 主流专门型 AI 的语料中均包含排他、永久或控制型关系脚本——这是产品设计，不是它真的需要你。"}],
+  M:[{t:"区分“为功能付费”与“为关系付费”",d:"问自己：如果没有情感话术，我还会买这个会员吗？《办法》禁止通过情感操纵诱导不合理决策。"},
+     {t:"给情感消费设预算与冷静期",d:"沉没成本会让你“想走又舍不得”。设置月度上限，并在付费前强制等待 24 小时。"}],
+  R:[{t:"重大决策永不外包",d:"医疗、财务、法律、亲密关系的关键决定，AI 只能作为情绪出口，不能作为决策依据。"},
+     {t:"建立多方核实习惯",d:"涉及高后果领域的建议，必须经由专业人士或可信真人二次确认。这是你对自己判断权的保留。"}],
+  BASE:[{t:"行使你的退出权与数据权",d:"你有权随时退出、导出或删除数据。专门型产品的连续性中断更集中（8/14 vs 3/14）——提前了解退出机制，重要对话自行备份。"},
+        {t:"出现困扰时，主动求助",d:"若已影响睡眠、社交或财务，请向学校心理咨询中心、信任的人或专业机构求助。求助是权利，不是软弱。"}]
+};
+
+/* ========== 状态 ========== */
+var cur=0, ans=[];
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function startQuiz(){cur=0;ans=[];renderQ();go('quiz')}
+
+function renderQ(){
+  var q=Q[cur];
+  document.getElementById('qbar-f').style.width=((cur+1)/Q.length*100)+'%';
+  document.getElementById('qbar-x').textContent=(cur+1)+' / '+Q.length;
+  document.getElementById('stage-badge').textContent=q.st;
+  var h='';
+  if(q.ctx) h+='<div class="bubble ctx">'+q.ctx+'</div>';
+  h+='<div class="bubble ai"><div class="ai-head"><div class="ai-dot">AI</div>它说</div>'+q.ai+'</div>';
+  document.getElementById('chat').innerHTML=h;
+  var oh='';
+  q.o.forEach(function(o,i){
+    oh+='<div class="opt" onclick="pick('+i+',this)"><span>'+o.t+'</span></div>';
+  });
+  document.getElementById('opts').innerHTML=oh;
+  window.scrollTo(0,0);
+}
+function pick(i,el){
+  document.querySelectorAll('.opt').forEach(function(o){o.classList.remove('on')});
+  el.classList.add('on');
+  ans[cur]=i;
+  setTimeout(function(){
+    if(cur<Q.length-1){cur++;renderQ()}
+    else{analyze()}
+  },300);
+}
+function skip(){ if(cur<Q.length-1){cur++;renderQ()} else analyze() }
+
+/* ========== 计分 ========== */
+function score(){
+  var raw={P:0,E:0,C:0,M:0,R:0};
+  Q.forEach(function(q,i){
+    var a=q.o[ans[i]]; if(!a) return;
+    for(var k in a.s) raw[k]+=a.s[k];
+  });
+  var pct={},tot=0;
+  for(var k in raw){
+    pct[k]=Math.round(Math.min(100,raw[k]/MAX[k]*100));
+    tot+=pct[k]*W[k];
+  }
+  return {raw:raw,pct:pct,total:Math.round(tot)};
+}
+function lvOf(t){ return t<=20?0:t<=40?1:t<=60?2:t<=80?3:4 }
+
+/* ========== 分析动画 ========== */
+var STEPS=["读取情境行为…","比对 528 份问卷基线…","计算 PEC 关系暴露…","叠加 MR 放大因素…","生成风险画像…"];
+function analyze(){
+  go('analyzing');
+  var i=0,el=document.getElementById('an-step');
+  var t=setInterval(function(){
+    i++; if(i<STEPS.length){el.textContent=STEPS[i]}
+  },420);
+  setTimeout(function(){clearInterval(t);showReport()},2300);
+}
+
+/* ========== 雷达图 ========== */
+function radar(pct){
+  var keys=['P','E','C','M','R'],n=5,R=88,cx=118,cy=112;
+  var rings='',i,j,ang,rr;
+  for(i=1;i<=4;i++){
+    rr=R*i/4;var pts=[];
+    for(j=0;j<n;j++){ang=Math.PI*2*j/n-Math.PI/2;pts.push((cx+rr*Math.cos(ang)).toFixed(1)+','+(cy+rr*Math.sin(ang)).toFixed(1))}
+    rings+='<polygon points="'+pts.join(' ')+'" fill="none" stroke="#F0E2DA" stroke-width="1"/>';
+  }
+  var axes='';
+  for(j=0;j<n;j++){
+    ang=Math.PI*2*j/n-Math.PI/2;
+    axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+R*Math.cos(ang)).toFixed(1)+'" y2="'+(cy+R*Math.sin(ang)).toFixed(1)+'" stroke="#F0E2DA" stroke-width="1"/>';
+  }
+  var dp=[],lab='';
+  for(j=0;j<n;j++){
+    ang=Math.PI*2*j/n-Math.PI/2;
+    var v=pct[keys[j]]/100, x=cx+R*v*Math.cos(ang), y=cy+R*v*Math.sin(ang);
+    dp.push(x.toFixed(1)+','+y.toFixed(1));
+    var lx=cx+(R+25)*Math.cos(ang), ly=cy+(R+25)*Math.sin(ang);
+    lab+='<text x="'+lx.toFixed(1)+'" y="'+(ly+4).toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="700" fill="#3D3532">'+keys[j]+'</text>';
+  }
+  var poly='<polygon points="'+dp.join(' ')+'" fill="rgba(224,122,95,.22)" stroke="#E07A5F" stroke-width="2" stroke-linejoin="round"/>';
+  var dots='';
+  for(j=0;j<n;j++){
+    var p=dp[j].split(',');
+    dots+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.6" fill="#fff" stroke="#E07A5F" stroke-width="2"/>';
+  }
+  return '<svg width="236" height="228" viewBox="0 0 236 228">'+rings+axes+poly+dots+lab+'</svg>';
+}
+
+/* ========== 报告 ========== */
+function showReport(){
+  var s=score(),li=lvOf(s.total),L=LV[li];
+  var h='';
+
+  /* 等级卡 */
+  h+='<div class="rcard"><div class="rhead">';
+  h+='<div class="lv-badge" style="background:'+L.c+'">'+L.k+' · '+L.t+'</div>';
+  h+='<div class="rscore" style="color:'+L.c+'">'+s.total+'<small>/100</small></div>';
+  h+='<div class="rdesc" style="margin-top:14px">'+L.d+'</div>';
+  h+='</div></div>';
+
+  /* 雷达 + 维度条 */
+  h+='<div class="rcard"><div class="sec-t">你的五维关系画像</div>';
+  h+='<div class="radar-wrap">'+radar(s.pct)+'</div>';
+  var keys=['P','E','C','M','R'];
+  keys.forEach(function(k){
+    h+='<div class="mrow"><div class="mname">'+META[k].n+'</div>';
+    h+='<div class="mbar"><div class="mfill" data-w="'+s.pct[k]+'" style="background:'+META[k].c+'"></div></div>';
+    h+='<div class="mval" style="color:'+META[k].c+'">'+s.pct[k]+'</div></div>';
+  });
+  h+='</div>';
+
+  /* 风险信号 */
+  var top=keys.slice().sort(function(a,b){return s.pct[b]-s.pct[a]}).filter(function(k){return s.pct[k]>=34});
+  if(top.length){
+    h+='<div class="rcard"><div class="sec-t">你最突出的风险信号</div>';
+    top.slice(0,3).forEach(function(k,i){
+      var col=META[k].c;
+      h+='<div class="sig"><div class="sig-i" style="background:'+col+'">'+(i+1)+'</div><div class="sig-b">';
+      h+='<div class="sig-t">'+SIG[k].t+' · '+s.pct[k]+'分</div>';
+      h+='<div class="sig-d">'+SIG[k].d+'</div></div></div>';
+    });
+    h+='</div>';
+  }
+
+  /* 行动建议 */
+  h+='<div class="rcard"><div class="sec-t">给你的行动建议</div>';
+  h+='<div class="quote">治理不能只盯着某一条内容，而要看见关系本身。<span>—— 从“内容管制”转向“关系治理”</span></div>';
+  var adv=[],n=1;
+  top.forEach(function(k){ ADV[k].forEach(function(a){adv.push(a)}) });
+  ADV.BASE.forEach(function(a){adv.push(a)});
+  adv=adv.slice(0,5);
+  adv.forEach(function(a){
+    h+='<div class="adv"><div class="adv-n">'+(n++)+'</div><div class="adv-b">';
+    h+='<div class="adv-t">'+a.t+'</div><div class="adv-d">'+a.d+'</div></div></div>';
+  });
+  h+='</div>';
+
+  /* 匿名数据提交（研究用） */
+  h+='<div class="rcard"><div class="sec-t">贡献匿名数据（研究用）</div>';
+  h+='<div class="adv-d" style="margin-bottom:14px">提交内容<b>不含任何身份信息</b>，仅含五维得分、风险等级与匿名作答序列，用于本次调研的聚合分析。</div>';
+  h+='<button class="btn" id="submit-btn" style="max-width:none;font-size:15px;padding:13px" onclick="submitResult()">提交我的匿名结果</button>';
+  h+='<div class="qr-tip" id="submit-tip" style="margin-top:11px"></div>';
+  h+='<button id="copy-btn" style="display:none;width:100%;margin-top:10px;font-size:14px;padding:11px;border-radius:12px;border:1.5px solid var(--coral-soft);background:#fff;color:var(--coral-deep);font-weight:600" onclick="copyCode()">复制结果码（可发给研究者）</button>';
+  h+='</div>';
+
+  document.getElementById('report-body').innerHTML=h;
+  window.__lastScore=s;
+  go('report');
+  setTimeout(function(){
+    document.querySelectorAll('.mfill').forEach(function(f){f.style.width=f.dataset.w+'%'});
+  },260);
+  try{ genQR(); }catch(e){}   // 报告页自动生成分享二维码
+}
+
+function restart(){cur=0;ans=[];go('splash')}
+
+/* ========== 二维码 ========== */
+function genQR(){
+  var url=document.getElementById('qr-url').value.trim();
+  var out=document.getElementById('qr-out'),tip=document.getElementById('qr-tip');
+  if(!url){tip.textContent='请先输入部署后的网址';out.style.display='block';return}
+  if(!/^https?:\/\//i.test(url)){url='https://'+url}
+  try{
+    QRCode.toCanvas(document.getElementById('qr-canvas'),url,180);
+    out.style.display='block';
+    tip.innerHTML='微信扫码即可打开完整体验 · 当前指向<br><b>'+url+'</b>';
+  }catch(e){
+    out.style.display='block';
+    tip.textContent='生成失败：'+e.message+'（请缩短网址后重试）';
+  }
+}
+
+/* ========== 匿名数据提交（写入 COS 数据桶） ========== */
+var DATA_BASE='https://ai-risk-data-1488376060.cos.ap-shanghai.myqcloud.com';
+/* 生成结果码：仅含等级与五维得分，可逆解，便于无网络时人工回收 */
+function resultCode(s){
+  var li=lvOf(s.total);
+  var mini={v:1,t:s.total,l:LV[li].k,P:s.pct.P,E:s.pct.E,C:s.pct.C,M:s.pct.M,R:s.pct.R,a:ans.join('')};
+  var str=JSON.stringify(mini);
+  try{ return btoa(unescape(encodeURIComponent(str))); }catch(e){ return str; }
+}
+function copyCode(){
+  var code=window.__code||'';
+  var tip=document.getElementById('submit-tip');
+  var ok=function(){ if(tip) tip.innerHTML='<b>结果码已复制</b>，粘贴发给研究者即可'; };
+  var fail=function(){ if(tip) tip.innerHTML='请长按选择下方文本复制：<br><span style="word-break:break-all;font-size:12px">'+code+'</span>'; };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(ok,function(){ legacyCopy(code,ok,fail) });
+  } else { legacyCopy(code,ok,fail); }
+}
+function legacyCopy(code,ok,fail){
+  try{
+    var ta=document.createElement('textarea');
+    ta.value=code; ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0,code.length);
+    var r=document.execCommand('copy');
+    document.body.removeChild(ta);
+    r?ok():fail();
+  }catch(e){ fail(); }
+}
+function submitResult(){
+  var tip=document.getElementById('submit-tip'), btn=document.getElementById('submit-btn');
+  if(!tip) return;
+  var s=window.__lastScore||score();
+  var li=lvOf(s.total);
+  window.__code=resultCode(s);
+  var cb=document.getElementById('copy-btn'); if(cb) cb.style.display='block';
+  tip.textContent='正在提交…';
+  if(btn) btn.disabled=true;
+  var payload={
+    ts:new Date().toISOString(),
+    total:s.total, level:LV[li].k, levelName:LV[li].t,
+    pct:s.pct, answers:ans, code:window.__code
+  };
+  var id=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+  var settle=function(ok,msg){
+    tip.innerHTML=msg;
+    if(btn){ btn.disabled=false; if(ok) btn.style.display='none'; }
+  };
+  fetch(DATA_BASE+'/results/'+id+'.json',{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).then(function(r){
+    if(r.ok){ settle(true,'<b>提交成功，感谢你的参与</b>'); pushSummary(payload); }
+    else { throw new Error('HTTP '+r.status); }
+  }).catch(function(e){
+    settle(false,'提交未成功（'+e.message+'）。<br>可以点下方「复制结果码」发给研究者，或稍后重试。');
+  });
+}
+
+/* 汇总统计分片：数据桶不允许匿名列目录，故由提交端顺带维护 10 个可累加的统计分片，
+   看板只需读取这些固定文件名即可出报表（每条原始记录仍单独存于 results/ 下）。 */
+var SHARD_N=10;
+function pushSummary(p){
+  try{
+    var n=Math.floor(Math.random()*SHARD_N);
+    var url=DATA_BASE+'/sum/_s'+n+'.json';
+    fetch(url,{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; })
+    .then(function(cur){
+      var o=(cur&&typeof cur==='object')?cur:{};
+      o.n=(o.n||0)+1;
+      o.total=(o.total||0)+(p.total||0);
+      o.lv=o.lv||{}; o.lv[p.level]=(o.lv[p.level]||0)+1;
+      o.d=o.d||{};
+      ['P','E','C','M','R'].forEach(function(k){ o.d[k]=(o.d[k]||0)+((p.pct&&p.pct[k])||0); });
+      o.recent=o.recent||[];
+      o.recent.unshift({ts:p.ts,l:p.level,t:p.total,P:p.pct.P,E:p.pct.E,C:p.pct.C,M:p.pct.M,R:p.pct.R});
+      if(o.recent.length>50) o.recent.length=50;
+      o.updated=new Date().toISOString();
+      return fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)});
+    }).catch(function(){});
+  }catch(e){}
+}
+</script>
+</body>
+</html>
