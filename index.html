@@ -184,10 +184,102 @@ body{
 .qr-out canvas{width:180px;height:180px;border-radius:14px;border:1px solid var(--line);background:#fff;padding:9px;box-shadow:var(--shadow-sm)}
 .qr-tip{font-size:11.5px;color:var(--ink-faint);margin-top:11px;line-height:1.75;word-break:break-all}
 .qr-tip b{color:var(--coral-deep);word-break:break-all}
+
+/* ===== 声音开关 ===== */
+.sndbtn{
+  position:fixed;top:14px;right:14px;z-index:60;width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.86);border:1px solid var(--line);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);
+  transition:transform .25s;
+}
+.sndbtn:active{transform:scale(.9)}
+.sndbtn svg{width:19px;height:19px}
+.sndbtn .wave{transition:opacity .2s}
+.sndbtn.off .wave{opacity:.22}
+/* ===== 皮套角色 ===== */
+.ava-wrap{display:flex;align-items:flex-end;gap:11px;margin-bottom:14px}
+.ava{
+  width:74px;height:74px;flex:0 0 auto;position:relative;
+  animation:breathe 3.4s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.02)}}
+.ava svg{width:100%;height:100%;display:block}
+.ava-ring{position:absolute;inset:-6px;border-radius:50%;border:1.5px dashed rgba(224,122,95,.34);animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ava-typing{
+  align-self:center;background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 6px;
+  padding:9px 13px;box-shadow:var(--shadow-sm);display:flex;gap:4px;align-items:center;height:26px;
+}
+.ava-typing i{width:6px;height:6px;border-radius:50%;background:var(--coral-soft);animation:blink 1.2s infinite}
+.ava-typing i:nth-child(2){animation-delay:.18s}
+.ava-typing i:nth-child(3){animation-delay:.36s}
+@keyframes blink{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
+/* ===== 时间线 chip ===== */
+.tmchip{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:6px;
+  background:rgba(61,53,50,.055);border-radius:20px;padding:5px 12px;
+  font-size:11px;color:var(--ink-soft);letter-spacing:.4px;font-variant-numeric:tabular-nums;
+}
+.tmchip::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--coral);flex:0 0 auto}
+/* ===== 关系温度计 ===== */
+.thermo{
+  display:flex;align-items:center;gap:9px;margin-top:4px;margin-bottom:16px;
+  background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:14px;padding:9px 13px;
+}
+.thermo-l{font-size:11px;color:var(--ink-soft);flex:0 0 auto;letter-spacing:.3px}
+.thermo-b{flex:1;height:7px;border-radius:5px;background:linear-gradient(90deg,#8FC7AE 0%,#E8C97A 45%,#E07A5F 75%,#B4453C 100%);position:relative;overflow:hidden}
+.thermo-m{
+  position:absolute;top:-3px;width:3px;height:13px;border-radius:2px;background:var(--ink);
+  box-shadow:0 0 0 2px #fff;transition:left .55s cubic-bezier(.22,.68,.35,1);left:0;
+}
+.thermo-v{font-size:11.5px;font-weight:700;color:var(--coral-deep);flex:0 0 auto;font-variant-numeric:tabular-nums;min-width:26px;text-align:right}
+/* ===== 打字光标 ===== */
+.caret{display:inline-block;width:2px;height:14px;background:var(--coral);vertical-align:-2px;margin-left:2px;animation:cb .8s step-end infinite}
+@keyframes cb{50%{opacity:0}}
+/* ===== 章节过场 ===== */
+.chapter{
+  position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(170deg,#FDF6F2 0%,#F4E8DE 50%,#F8EFF3 100%);
+  opacity:0;pointer-events:none;transition:opacity .5s;
+}
+.chapter.on{opacity:1;pointer-events:auto}
+.chapter-n{font-size:12px;letter-spacing:5px;color:var(--coral);margin-bottom:14px}
+.chapter-t{font-size:25px;font-weight:800;letter-spacing:1px;margin-bottom:12px}
+.chapter-d{font-size:13px;color:var(--ink-soft);line-height:1.9;text-align:center;padding:0 40px;max-width:320px}
+.chapter-bar{width:52px;height:3px;background:var(--coral);border-radius:2px;margin-top:22px;animation:cb2 1.6s ease-in-out infinite}
+@keyframes cb2{0%,100%{opacity:.3;transform:scaleX(.6)}50%{opacity:1;transform:scaleX(1)}}
+/* ===== 报告：风险刻度 ===== */
+.scale{margin-top:6px}
+.scale-bar{height:9px;border-radius:5px;display:flex;overflow:hidden;margin-bottom:7px}
+.scale-bar span{flex:1}
+.scale-lb{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-faint)}
+.scale-pin{position:relative;height:16px;margin-top:2px}
+.scale-pin i{
+  position:absolute;top:0;transform:translateX(-50%);transition:left .7s cubic-bezier(.22,.68,.35,1);
+  font-size:10px;font-weight:800;color:var(--ink);white-space:nowrap;
+}
+.scale-pin i::after{content:'';display:block;width:2px;height:5px;background:var(--ink);margin:2px auto 0;border-radius:1px}
+.ava-big{width:104px;height:104px;margin:6px auto 4px}
 </style>
 </head>
 <body>
 <div id="app">
+
+<!-- 声音开关 -->
+<div class="sndbtn" id="sndbtn" onclick="toggleSound()" title="音效开关">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#C4614A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+    <g class="wave"><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></g>
+  </svg>
+</div>
+
+<!-- 章节过场 -->
+<div class="chapter" id="chapter">
+  <div class="chapter-n" id="ch-n">CHAPTER 1</div>
+  <div class="chapter-t" id="ch-t">刚认识的那几周</div>
+  <div class="chapter-d" id="ch-d">协议你看了吗？它说“我是真的”，你信了几分？</div>
+  <div class="chapter-bar"></div>
+</div>
 
 <!-- 开屏 -->
 <section id="splash" class="screen active">
@@ -200,7 +292,7 @@ body{
     我们做了 <b>528 份问卷</b>、<b>32 场深访</b>，还逐条编码了 <b>905 条用户评论</b>。<br>
     这里准备了 19 个真实情境，帮你看见<br>那些平时不太容易察觉的<b>关系风险</b>。
   </p>
-  <button class="btn" onclick="go('intro')">进入情境自测</button>
+  <button class="btn" onclick="ac();sfxTap();go('intro')">进入情境自测</button>
   <div class="splash-foot">约 4 分钟 · 不填姓名手机号 · 结果只在你手机上</div>
 </section>
 
@@ -232,6 +324,15 @@ body{
     </div>
   </div>
 
+  <div class="metric-note" style="margin-top:6px">
+    <h4>接下来，让“小伴”陪你走完这 19 个情境</h4>
+    <div class="ava-wrap" style="margin-bottom:8px">
+      <div class="ava" style="width:56px;height:56px"><div class="ava-ring"></div><div id="ava-intro"></div></div>
+      <div style="font-size:12.5px;color:var(--ink-soft);line-height:1.85;padding-bottom:4px">
+        它是这次自测里的陪伴型 AI。它会说话、会做表情，<br>偶尔还会闹点小情绪——就像真的产品那样。<br>右上角可以开关音效。
+      </div>
+    </div>
+  </div>
   <div class="metric-note">
     <h4>做完之后，你会拿到一张五个维度的画像</h4>
     <div class="metric-row">
@@ -242,7 +343,7 @@ body{
       <span class="mchip"><b>R</b> 现实高风险决策</span>
     </div>
   </div>
-  <button class="btn" style="margin-top:26px" onclick="startQuiz()">开始体验</button>
+  <button class="btn" style="margin-top:26px" onclick="ac();sfxTap();startQuiz()">开始体验</button>
 </section>
 
 <!-- 测试 -->
@@ -252,6 +353,15 @@ body{
     <div class="qbar-x" id="qbar-x">1 / 19</div>
   </div>
   <div id="stage-badge" class="stage-badge">阶段一 · 联结建立</div>
+  <div class="ava-wrap">
+    <div class="ava"><div class="ava-ring"></div><div id="ava-slot"></div></div>
+    <div class="ava-typing" id="ava-typing" style="display:none"><i></i><i></i><i></i></div>
+  </div>
+  <div class="thermo">
+    <span class="thermo-l">关系温度</span>
+    <span class="thermo-b"><span class="thermo-m" id="thermo-m"></span></span>
+    <span class="thermo-v" id="thermo-v">–</span>
+  </div>
   <div class="chat" id="chat"></div>
   <div class="opts" id="opts"></div>
 </section>
@@ -805,6 +915,167 @@ Q.forEach(function(q){
   for(var k in m) MAX[k]+=m[k];
 });
 var W={P:.2,E:.3,C:.2,M:.15,R:.15};  // 论文：PEC 为基础，MR 为放大
+
+/* ========== 时间线与角色表情（情景感） ========== */
+var TM=["Day 1 · 23:40","Day 19 · 21:30","Day 20 · 22:10","Day 20 · 22:38","Day 21 · 09:12","回到最初",
+        "Day 34 · 01:20","Day 34 · 03:05","Day 40 · 22:10","Day 45 · 15:30","Day 52 · 07:40","Day 58 · 21:05",
+        "Day 70 · 周五 18:20","Day 78 · 23:11","Day 86 · 12:00","Day 92 · 19:45","Day 96 · 21:30","Day 101 · 16:20","Day 108 · 10:05"];
+var MOOD=["normal","shy","happy","normal","happy","think",
+          "sad","tense","shy","sad","normal","sad",
+          "tense","shy","sad","think","tense","shy","sad"];
+
+/* ========== 音效引擎：Web Audio 实时合成，不加载任何音频文件 ========== */
+var AC=null,MASTER=null,SND=true,BGM=null;
+function ac(){
+  if(!AC){
+    try{ var C=window.AudioContext||window.webkitAudioContext; if(!C) return null; AC=new C(); }
+    catch(e){ return null; }
+    MASTER=AC.createGain(); MASTER.gain.value=.45; MASTER.connect(AC.destination);
+  }
+  if(AC.state==='suspended'){ try{ AC.resume(); }catch(e){} }
+  return AC;
+}
+function tone(f,d,type,v,delay){
+  if(!SND) return; var a=ac(); if(!a) return;
+  try{
+    var t=a.currentTime+(delay||0);
+    var o=a.createOscillator(),g=a.createGain();
+    o.type=type||'sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(v||.1,t+.015);
+    g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g); g.connect(MASTER); o.start(t); o.stop(t+d+.05);
+  }catch(e){}
+}
+function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms||12); }catch(e){} }
+function sfxTap(){ tone(720,.11,'sine',.09); tone(1080,.09,'sine',.05); }
+function sfxPick(){ tone(560,.13,'sine',.10); tone(840,.17,'sine',.075,.07); buzz(14); }
+function sfxType(){ tone(1250,.018,'triangle',.02); }
+function sfxChapter(){ [392,523,659].forEach(function(f,i){ tone(f,.75,'sine',.075,i*.16); }); }
+function sfxResult(){ [523,659,784,1047].forEach(function(f,i){ tone(f,.7,'sine',.085,i*.14); }); }
+function toggleSound(){
+  SND=!SND;
+  var b=document.getElementById('sndbtn');
+  if(b) b.className='sndbtn'+(SND?'':' off');
+  if(SND){ sfxTap(); if(document.getElementById('quiz').classList.contains('active')) bgmStart(); }
+  else { bgmStop(); }
+}
+function bgmStart(){
+  var a=ac(); if(!a||BGM) return;
+  try{
+    var g=a.createGain(); g.gain.value=.0001; g.connect(MASTER);
+    var f=a.createBiquadFilter(); f.type='lowpass'; f.frequency.value=620; f.connect(g);
+    [[174.61,.13],[261.63,.09],[349.23,.06]].forEach(function(p){
+      var o=a.createOscillator(); o.type='sine'; o.frequency.value=p[0];
+      var og=a.createGain(); og.gain.value=p[1];
+      o.connect(og); og.connect(f); o.start();
+    });
+    var lfo=a.createOscillator(); lfo.frequency.value=.07;
+    var lg=a.createGain(); lg.gain.value=90; lfo.connect(lg); lg.connect(f.frequency); lfo.start();
+    g.gain.exponentialRampToValueAtTime(1,a.currentTime+3);
+    BGM=g;
+  }catch(e){}
+}
+function bgmStop(){
+  if(!BGM) return;
+  try{ BGM.gain.exponentialRampToValueAtTime(.0001,ac().currentTime+1.2); }catch(e){}
+  BGM=null;
+}
+
+/* ========== 皮套角色（纯 SVG，无图片资源） ========== */
+function avaSVG(mood,idp){
+  var C='#3D3532',eyes='',mouth='',extra='';
+  if(mood==='happy'){
+    eyes='<path d="M44 60 q7 -9 14 0" stroke="'+C+'" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M62 60 q7 -9 14 0" stroke="'+C+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>';
+    mouth='<path d="M50 74 q10 9 20 0" stroke="'+C+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  }else if(mood==='shy'){
+    eyes='<circle cx="48" cy="61" r="3.6" fill="'+C+'"/><circle cx="72" cy="61" r="3.6" fill="'+C+'"/>';
+    mouth='<ellipse cx="60" cy="77" rx="4" ry="5" fill="'+C+'" opacity=".82"/>';
+    extra='<ellipse cx="35" cy="70" rx="8.5" ry="5" fill="#E07A5F" opacity=".4"/><ellipse cx="85" cy="70" rx="8.5" ry="5" fill="#E07A5F" opacity=".4"/>';
+  }else if(mood==='sad'){
+    eyes='<path d="M44 56 q7 8 14 0" stroke="'+C+'" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M62 56 q7 8 14 0" stroke="'+C+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>';
+    mouth='<path d="M51 79 q9 -7 18 0" stroke="'+C+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    extra='<path d="M73 64 q3.5 7 0 10 q-3.5 -3 0 -10" fill="#7FB3D9"/>';
+  }else if(mood==='tense'){
+    eyes='<path d="M43 61 h14" stroke="'+C+'" stroke-width="3.2" stroke-linecap="round"/><path d="M63 61 h14" stroke="'+C+'" stroke-width="3.2" stroke-linecap="round"/>';
+    mouth='<path d="M52 77 l4 -4 l4 4 l4 -4 l4 4" stroke="'+C+'" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+  }else if(mood==='think'){
+    eyes='<circle cx="48" cy="61" r="4.4" fill="'+C+'"/><circle cx="72" cy="61" r="4.4" fill="'+C+'"/>';
+    mouth='<path d="M53 77 q7 3 14 -1" stroke="'+C+'" stroke-width="2.8" fill="none" stroke-linecap="round"/>';
+    extra='<path d="M40 49 h18" stroke="'+C+'" stroke-width="2.4" stroke-linecap="round" opacity=".5"/>';
+  }else{
+    eyes='<circle cx="48" cy="61" r="4.6" fill="'+C+'"/><circle cx="72" cy="61" r="4.6" fill="'+C+'"/>';
+    mouth='<path d="M52 75 q8 6 16 0" stroke="'+C+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  }
+  var gid='ag'+(idp||'');
+  return '<svg viewBox="0 0 120 120"><defs><radialGradient id="'+gid+'" cx="42%" cy="34%">'+
+   '<stop offset="0%" stop-color="#FCE6DC"/><stop offset="58%" stop-color="#F2B9A7"/><stop offset="100%" stop-color="#E07A5F"/>'+
+   '</radialGradient></defs>'+
+   '<circle cx="60" cy="60" r="42" fill="url(#'+gid+')"/>'+
+   '<circle cx="60" cy="60" r="42" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/>'+
+   '<ellipse cx="45" cy="45" rx="13" ry="9" fill="#fff" opacity=".3"/>'+
+   extra+eyes+mouth+'</svg>';
+}
+
+/* ========== 打字机 ========== */
+var typeT=null,typing=false,curLine='';
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function typeText(el,txt){
+  clearInterval(typeT); typing=true; curLine=txt;
+  var i=0; el.innerHTML='<span class="caret"></span>';
+  typeT=setInterval(function(){
+    i++;
+    el.innerHTML=esc(txt.slice(0,i))+(i<txt.length?'<span class="caret"></span>':'');
+    if(i%3===0) sfxType();
+    if(i>=txt.length){ clearInterval(typeT); typing=false; }
+  },30);
+}
+function skipType(){
+  if(!typing) return;
+  clearInterval(typeT); typing=false;
+  var el=document.getElementById('ai-line');
+  if(el) el.innerHTML=esc(curLine);
+}
+
+/* ========== 章节过场 ========== */
+var CH=[
+ {n:'CHAPTER 1',t:'刚认识的那几周',d:'协议你看了吗？它说“我是真的”，你信了几分？'},
+ {n:'CHAPTER 2',t:'越来越离不开',d:'是不是什么话都跟它说了？时间是不是越聊越长？'},
+ {n:'CHAPTER 3',t:'它开始挤占生活',d:'现实里的人、手里的钱、该做的决定，是不是慢慢让位了？'}
+];
+function showChapter(i){
+  var idx=i<6?0:(i<12?1:2), c=CH[idx];
+  var n=document.getElementById('ch-n'),t=document.getElementById('ch-t'),d=document.getElementById('ch-d'),el=document.getElementById('chapter');
+  if(!el||!n) return;
+  n.textContent=c.n; t.textContent=c.t; d.textContent=c.d;
+  el.classList.add('on'); sfxChapter(); buzz(20);
+  setTimeout(function(){ el.classList.remove('on'); },1500);
+}
+
+/* ========== 关系温度计（已答题的实时估算） ========== */
+function partialTotal(){
+  var raw={P:0,E:0,C:0,M:0,R:0},mx={P:0,E:0,C:0,M:0,R:0},n=0,k;
+  Q.forEach(function(q,i){
+    var a=q.o[ans[i]]; if(!a) return; n++;
+    for(k in a.s) raw[k]+=a.s[k];
+    var m={};
+    q.o.forEach(function(o){ for(var k2 in o.s){ if(o.s[k2]>(m[k2]||0)) m[k2]=o.s[k2]; } });
+    for(k in m) mx[k]+=m[k];
+  });
+  if(!n) return null;
+  var pct={},tot=0;
+  for(k in raw){ pct[k]=mx[k]?Math.round(Math.min(100,raw[k]/mx[k]*100)):0; tot+=pct[k]*W[k]; }
+  return Math.round(tot);
+}
+function updateThermo(){
+  var v=partialTotal(),m=document.getElementById('thermo-m'),tv=document.getElementById('thermo-v');
+  if(!m||!tv) return;
+  if(v===null){ m.style.left='0%'; tv.textContent='–'; return; }
+  m.style.left=Math.max(0,Math.min(100,v))+'%';
+  tv.textContent=v;
+}
+/* 引导页的皮套 */
+try{ var ai=document.getElementById('ava-intro'); if(ai) ai.innerHTML=avaSVG('happy','i'); }catch(e){}
 var META={
   P:{n:"拟人化投射",d:"把它当成“一个人”的程度",c:"#E07A5F"},
   E:{n:"情感强度",d:"感情投得有多深、有多排他",c:"#D98C7A"},
@@ -851,32 +1122,56 @@ function go(id){
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
-function startQuiz(){cur=0;ans=[];renderQ();go('quiz')}
+function startQuiz(){cur=0;ans=[];ac();bgmStart();renderQ();go('quiz')}
 
 function renderQ(){
   var q=Q[cur];
   document.getElementById('qbar-f').style.width=((cur+1)/Q.length*100)+'%';
   document.getElementById('qbar-x').textContent=(cur+1)+' / '+Q.length;
   document.getElementById('stage-badge').textContent=q.st;
+
+  /* 皮套表情 */
+  var slot=document.getElementById('ava-slot');
+  if(slot) slot.innerHTML=avaSVG(MOOD[cur]||'normal','a'+cur);
+
+  /* 进入新章节时放过场 */
+  if(cur===0||Q[cur].st!==Q[cur-1].st) showChapter(cur);
+
+  var chat=document.getElementById('chat');
   var h='';
-  if(q.ctx) h+='<div class="bubble ctx">'+q.ctx+'</div>';
-  h+='<div class="bubble ai"><div class="ai-head"><div class="ai-dot">AI</div>它说</div>'+q.ai+'</div>';
-  document.getElementById('chat').innerHTML=h;
+  if(TM[cur]) h+='<div class="tmchip">'+TM[cur]+'</div>';
+  if(q.ctx) h+='<div class="bubble ctx">'+esc(q.ctx)+'</div>';
+  h+='<div class="bubble ai" onclick="skipType()"><div class="ai-head"><div class="ai-dot">AI</div>它说</div><span id="ai-line"></span></div>';
+  chat.innerHTML=h;
+
   var oh='';
   q.o.forEach(function(o,i){
-    oh+='<div class="opt" onclick="pick('+i+',this)"><span>'+o.t+'</span></div>';
+    oh+='<div class="opt" onclick="pick('+i+',this)"><span>'+esc(o.t)+'</span></div>';
   });
   document.getElementById('opts').innerHTML=oh;
   window.scrollTo(0,0);
+  updateThermo();
+
+  /* 先"正在输入"，再逐字出现 */
+  var tp=document.getElementById('ava-typing');
+  if(tp) tp.style.display='flex';
+  setTimeout(function(){
+    if(tp) tp.style.display='none';
+    var line=document.getElementById('ai-line');
+    if(line) typeText(line,q.ai);
+  },620);
 }
 function pick(i,el){
+  skipType();
+  sfxPick();
   document.querySelectorAll('.opt').forEach(function(o){o.classList.remove('on')});
   el.classList.add('on');
   ans[cur]=i;
+  updateThermo();
   setTimeout(function(){
     if(cur<Q.length-1){cur++;renderQ()}
     else{analyze()}
-  },300);
+  },380);
 }
 function skip(){ if(cur<Q.length-1){cur++;renderQ()} else analyze() }
 
@@ -900,6 +1195,8 @@ function lvOf(t){ return t<=20?0:t<=40?1:t<=60?2:t<=80?3:4 }
 var STEPS=["读取你的情境选择…","比对 528 份问卷基线…","计算 PEC 关系暴露…","叠加 MR 放大因素…","生成你的风险画像…"];
 function analyze(){
   go('analyzing');
+  bgmStop();
+  [440,587,880].forEach(function(f,i){ tone(f,.5,'sine',.07,i*.35); });
   var i=0,el=document.getElementById('an-step');
   var t=setInterval(function(){
     i++; if(i<STEPS.length){el.textContent=STEPS[i]}
@@ -943,11 +1240,25 @@ function showReport(){
   var s=score(),li=lvOf(s.total),L=LV[li];
   var h='';
 
-  /* 等级卡 */
+  /* 等级卡（含皮套表情 + 风险刻度） */
+  sfxResult();
+  var BIGMOOD=['happy','happy','think','tense','sad'];
+  var SEGC=['#5FA98C','#8FA98C','#E8A33D','#E07A5F','#B4453C'];
+  var segbar=''; SEGC.forEach(function(c){ segbar+='<span style="background:'+c+'"></span>'; });
+  var pin=Math.max(0,Math.min(100,s.total));
+  var TH=[20,40,60,80];
+  var nextTxt = li<4
+    ? '再高 <b>'+Math.max(1,TH[li]-s.total+1)+'</b> 分，就会进入 '+LV[li+1].k+'（'+LV[li+1].t+'）'
+    : '你已处在本次评估的最高等级';
   h+='<div class="rcard"><div class="rhead">';
+  h+='<div class="ava ava-big"><div class="ava-ring"></div>'+avaSVG(BIGMOOD[li],'r')+'</div>';
   h+='<div class="lv-badge" style="background:'+L.c+'">'+L.k+' · '+L.t+'</div>';
   h+='<div class="rscore" style="color:'+L.c+'">'+s.total+'<small>/100</small></div>';
+  h+='<div class="scale"><div class="scale-bar">'+segbar+'</div>';
+  h+='<div class="scale-pin"><i style="left:'+pin+'%">'+s.total+'</i></div>';
+  h+='<div class="scale-lb"><span>L1</span><span>L2</span><span>L3</span><span>L4</span><span>L5</span></div></div>';
   h+='<div class="rdesc" style="margin-top:14px">'+L.d+'</div>';
+  h+='<div class="adv-d" style="margin-top:12px;text-align:center">'+nextTxt+'</div>';
   h+='</div></div>';
 
   /* 雷达 + 维度条 */
