@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>匿名数据看板 · 情感陪伴AI关系风险自测</title>
+<style>
+:root{
+  --coral:#E07A5F; --coral-deep:#C4614A; --coral-soft:#F2B9A7;
+  --cream:#F4E8DE; --blush:#F8EFF3; --paper:#FFFAF7;
+  --ink:#3D3532; --ink-soft:#7A6B66; --ink-faint:#A8998F;
+  --shadow:0 6px 22px rgba(120,80,65,.10);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;background:linear-gradient(170deg,#FDF6F2 0%,#F4E8DE 45%,#F8EFF3 100%);
+  color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  min-height:100vh;padding:20px 16px 60px;
+}
+.wrap{max-width:820px;margin:0 auto}
+.hd{text-align:center;margin-bottom:20px}
+.hd h1{font-size:21px;margin:0 0 6px;letter-spacing:.5px}
+.hd p{margin:0;font-size:12.5px;color:var(--ink-soft);line-height:1.6}
+.badge{display:inline-block;margin-top:9px;font-size:11.5px;padding:5px 11px;border-radius:20px;background:#fff;border:1px solid var(--coral-soft);color:var(--coral-deep)}
+.card{background:rgba(255,255,255,.92);border-radius:18px;box-shadow:var(--shadow);padding:18px 16px;margin-bottom:14px}
+.sec-t{font-size:14px;font-weight:700;margin:0 0 14px;display:flex;align-items:center;gap:7px}
+.sec-t::before{content:'';width:3px;height:14px;border-radius:2px;background:var(--coral)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--paper);border-radius:14px;padding:13px 10px;text-align:center;border:1px solid rgba(224,122,95,.14)}
+.stat .n{font-size:22px;font-weight:800;color:var(--coral-deep);line-height:1.2}
+.stat .l{font-size:11px;color:var(--ink-soft);margin-top:3px}
+.row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.row .nm{width:82px;flex:none;font-size:12.5px;color:var(--ink-soft)}
+.row .bar{flex:1;height:9px;border-radius:5px;background:#F0E4DC;overflow:hidden}
+.row .fill{height:100%;border-radius:5px;transition:width .5s ease}
+.row .vv{width:52px;flex:none;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.lg{display:flex;align-items:center;gap:7px;margin-bottom:10px;font-size:13px}
+.dot{width:11px;height:11px;border-radius:50%;flex:none}
+.lg .nm{width:96px;flex:none;font-size:12.5px;color:var(--ink)}
+.lg .ct{width:38px;text-align:right;font-weight:700;font-size:12.5px}
+.lg .bar{flex:1;height:9px;border-radius:5px;background:#F0E4DC;overflow:hidden}
+.lg .fill{height:100%;border-radius:5px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:7px 6px;text-align:left;border-bottom:1px solid #F2E7E0;white-space:nowrap}
+th{color:var(--ink-soft);font-weight:600;font-size:11.5px}
+td{font-variant-numeric:tabular-nums}
+.btn{
+  display:block;width:100%;border:none;border-radius:13px;padding:13px;font-size:15px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,var(--coral) 0%,var(--coral-deep) 100%);
+  box-shadow:0 5px 15px rgba(224,122,95,.28);cursor:pointer;
+}
+.btn:disabled{opacity:.6}
+.btn.g{background:#fff;color:var(--coral-deep);border:1.5px solid var(--coral-soft);box-shadow:none;font-size:14px;padding:11px;margin-top:10px}
+.tip{font-size:12.5px;color:var(--ink-soft);line-height:1.75}
+.note{background:#FFF8F0;border:1px solid #F2DCC8;color:#8A6A4F;border-radius:12px;padding:11px 13px;font-size:12px;line-height:1.8;margin-bottom:14px}
+.err{background:#FFF3F0;border:1px solid #F5C6BC;color:#B4453C;border-radius:12px;padding:12px 13px;font-size:12.5px;line-height:1.8}
+code{background:#F6EDE8;padding:1px 5px;border-radius:4px;font-size:11.5px;word-break:break-all}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--ink-faint)}
+.linkbox{background:var(--paper);border:1px dashed var(--coral-soft);border-radius:12px;padding:11px 12px;font-size:12px;word-break:break-all;margin-top:8px;line-height:1.9}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <h1>匿名数据看板</h1>
+    <p>情感陪伴型人工智能 · 关系风险自测<br>数据实时来自匿名提交，不含任何身份信息</p>
+    <div class="badge" id="mode" style="display:none"></div>
+  </div>
+
+  <div id="err"></div>
+
+  <div class="card" id="c-sum" style="display:none">
+    <div class="sec-t">总体情况</div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="s-n">0</div><div class="l">有效样本</div></div>
+      <div class="stat"><div class="n" id="s-avg">0</div><div class="l">平均风险总分</div></div>
+      <div class="stat"><div class="n" id="s-hi">0%</div><div class="l">L4及以上占比</div></div>
+    </div>
+    <div style="margin-top:12px" class="mono" id="s-time"></div>
+  </div>
+
+  <div class="card" id="c-lv" style="display:none">
+    <div class="sec-t">风险等级分布</div>
+    <div id="lv-list"></div>
+  </div>
+
+  <div class="card" id="c-dim" style="display:none">
+    <div class="sec-t">五维平均得分（百分制）</div>
+    <div id="dim-list"></div>
+    <div class="tip" style="margin-top:12px">
+      P 拟人化投射 · E 情感强度 · C 交互持续性 · M 关系商业化 · R 现实高风险决策
+    </div>
+  </div>
+
+  <div class="card" id="c-act">
+    <div class="sec-t">数据操作</div>
+    <button class="btn" id="btn-load" onclick="load()">刷新数据</button>
+    <button class="btn g" onclick="exportCSV()">导出 CSV（可直接用 Excel 打开）</button>
+    <button class="btn g" onclick="copyAll()">复制全部数据（JSON）</button>
+    <div class="linkbox">
+      数据桶：<code>ai-risk-data-1488376060</code>（上海）<br>
+      原始记录：<code>results/*.json</code>（每条一份，可在 COS 控制台直接下载）<br>
+      汇总分片：<code>sum/_s0…_s9.json</code>（看板读取用）
+    </div>
+  </div>
+
+  <div class="card" id="c-tb" style="display:none">
+    <div class="sec-t">最近提交明细</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>时间</th><th>等级</th><th>总分</th><th>P</th><th>E</th><th>C</th><th>M</th><th>R</th></tr></thead>
+        <tbody id="tb-body"></tbody>
+      </table>
+    </div>
+    <div class="tip" style="margin-top:10px" id="tb-more"></div>
+  </div>
+</div>
+
+<script>
+var BASE='https://ai-risk-data-1488376060.cos.ap-shanghai.myqcloud.com';
+var LVK=[
+ {k:'L1',n:'清醒同行者',c:'#5FA98C'},
+ {k:'L2',n:'轻度投入者',c:'#8FA98C'},
+ {k:'L3',n:'情感依赖者',c:'#E8A33D'},
+ {k:'L4',n:'高风险卷入者',c:'#E07A5F'},
+ {k:'L5',n:'现实功能受损者',c:'#B4453C'}
+];
+var DIM=[['P','拟人化投射'],['E','情感强度'],['C','交互持续性'],['M','关系商业化'],['R','现实高风险决策']];
+var COLS=['#E07A5F','#E8A33D','#5FA98C','#8C7BA6','#B4453C'];
+var ROWS=[];      // 全量明细（仅当允许匿名列目录时）
+var SH=null;      // 汇总分片合并结果
+var MODE='agg';
+
+function el(id){return document.getElementById(id)}
+function showErr(h){ el('err').innerHTML='<div class="err">'+h+'</div>'; }
+function clearErr(){ el('err').innerHTML=''; }
+
+/* ---------- 读取汇总分片（始终可用） ---------- */
+function loadShards(){
+  var ps=[];
+  for(var i=0;i<10;i++){
+    (function(i){
+      ps.push(
+        fetch(BASE+'/sum/_s'+i+'.json',{cache:'no-store'})
+          .then(function(r){ return r.ok?r.json():null; })
+          .catch(function(){ return null; })
+      );
+    })(i);
+  }
+  return Promise.all(ps).then(function(arr){
+    var s={n:0,total:0,lv:{},d:{P:0,E:0,C:0,M:0,R:0},recent:[]};
+    arr.forEach(function(o){
+      if(!o||typeof o!=='object') return;
+      s.n+=(o.n||0); s.total+=(o.total||0);
+      for(var k in (o.lv||{})){ s.lv[k]=(s.lv[k]||0)+o.lv[k]; }
+      DIM.forEach(function(d){ s.d[d[0]]+=((o.d&&o.d[d[0]])||0); });
+      (o.recent||[]).forEach(function(x){ s.recent.push(x); });
+    });
+    s.recent.sort(function(a,b){ return String(b.ts).localeCompare(String(a.ts)); });
+    SH=s;
+  });
+}
+
+/* ---------- 尝试列出对象（多数情况下会被 403，属正常） ---------- */
+function listKeys(){
+  return fetch(BASE+'/?list-type=2&prefix=results/&max-keys=1000',{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+    .then(function(t){
+      if(t.indexOf('<Error>')>=0) throw new Error('AccessDenied');
+      var doc=new DOMParser().parseFromString(t,'application/xml');
+      var ks=doc.getElementsByTagName('Key'), out=[];
+      for(var i=0;i<ks.length;i++){
+        var k=ks[i].textContent;
+        if(/^results\/_/.test(k)) continue;
+        if(!/\.json$/.test(k)) continue;
+        out.push(k);
+      }
+      return out;
+    });
+}
+function fetchAll(keys){
+  ROWS=[];
+  var i=0;
+  function step(){
+    if(i>=keys.length) return Promise.resolve();
+    var batch=keys.slice(i,i+6); i+=6;
+    return Promise.all(batch.map(function(k){
+      return fetch(BASE+'/'+k,{cache:'no-store'})
+        .then(function(r){ return r.ok?r.json():null; })
+        .then(function(j){ if(j){ j.__key=k; ROWS.push(j); } })
+        .catch(function(){});
+    })).then(step);
+  }
+  return step();
+}
+
+function load(){
+  var b=el('btn-load');
+  b.disabled=true; b.innerHTML='<span class="spin"></span>正在读取…';
+  clearErr();
+  MODE='agg';
+  var listOk=false, keys=[];
+  Promise.all([
+    loadShards(),
+    listKeys().then(function(k){ listOk=true; keys=k; }).catch(function(){ listOk=false; })
+  ]).then(function(){
+    if(listOk && keys.length){ return fetchAll(keys).then(function(){ MODE='full'; }); }
+    MODE='agg';
+  }).then(function(){
+    b.disabled=false; b.textContent='刷新数据';
+    render();
+  }).catch(function(e){
+    b.disabled=false; b.textContent='刷新数据';
+    showErr('读取失败：'+e.message);
+  });
+}
+
+function fmt(iso){
+  if(!iso) return '-';
+  var d=new Date(iso);
+  if(isNaN(d)) return '-';
+  var p=function(n){return n<10?'0'+n:''+n};
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+/* 统一成 {n, avg, hiPct, cnt{}, dv{}, recent[]} */
+function compute(){
+  if(MODE==='full' && ROWS.length){
+    var n=ROWS.length, sum=0, hi=0, cnt={L1:0,L2:0,L3:0,L4:0,L5:0}, dv={P:0,E:0,C:0,M:0,R:0};
+    var recent=[];
+    ROWS.forEach(function(r){
+      sum+=(r.total||0);
+      if(r.level&&cnt[r.level]!==undefined) cnt[r.level]++;
+      if(r.level==='L4'||r.level==='L5') hi++;
+      DIM.forEach(function(d){ dv[d[0]]+=((r.pct&&r.pct[d[0]])||0); });
+      recent.push({ts:r.ts,l:r.level,t:r.total,P:(r.pct||{}).P,E:(r.pct||{}).E,C:(r.pct||{}).C,M:(r.pct||{}).M,R:(r.pct||{}).R});
+    });
+    recent.sort(function(a,b){ return String(b.ts).localeCompare(String(a.ts)); });
+    return {n:n,avg:sum/n,hi:hi,cnt:cnt,dv:dv,recent:recent};
+  }
+  if(SH && SH.n){
+    var n2=SH.n, hi2=(SH.lv.L4||0)+(SH.lv.L5||0);
+    var dv2={}; DIM.forEach(function(d){ dv2[d[0]]=SH.d[d[0]]/n2; });
+    return {n:n2,avg:SH.total/n2,hi:hi2,cnt:SH.lv,dv:dv2,recent:SH.recent};
+  }
+  return null;
+}
+
+function render(){
+  var m=el('mode');
+  m.style.display='inline-block';
+  var d=compute();
+  if(!d){
+    ['c-sum','c-lv','c-dim','c-tb'].forEach(function(id){el(id).style.display='none'});
+    m.textContent='等待数据';
+    showErr('还没有收到任何提交数据。<br>把自测二维码发出去，有人完成测试并点「提交我的匿名结果」后，刷新本页即可看到汇总。');
+    return;
+  }
+  clearErr();
+  m.textContent = MODE==='full' ? ('完整明细模式 · '+d.n+' 份') : ('汇总统计模式 · '+d.n+' 份');
+  if(MODE!=='full'){
+    var nb=document.createElement('div');
+    nb.className='note';
+    nb.innerHTML='当前为<b>汇总统计模式</b>：数据桶未开放匿名列目录，看板读取的是提交端维护的 10 个统计分片，'+
+      '样本量、均分、等级分布、五维均分均为<b>准确值</b>，明细展示最近记录。'+
+      '如需逐条原始数据，请到 COS 控制台「文件列表 → <code>results/</code>」下载。';
+    el('err').appendChild(nb);
+  }
+
+  var n=d.n;
+  el('c-sum').style.display='';
+  el('s-n').textContent=n;
+  el('s-avg').textContent=d.avg.toFixed(1);
+  el('s-hi').textContent=Math.round(d.hi/n*100)+'%';
+  var last=d.recent.length?d.recent[0].ts:'';
+  var first=d.recent.length?d.recent[d.recent.length-1].ts:'';
+  el('s-time').textContent='最早 '+fmt(first)+' · 最新 '+fmt(last)+' · 样本 '+n+' 份';
+
+  el('c-lv').style.display='';
+  var h='';
+  LVK.forEach(function(v){
+    var c=d.cnt[v.k]||0, w=Math.round(c/n*100);
+    h+='<div class="lg"><span class="dot" style="background:'+v.c+'"></span>';
+    h+='<span class="nm">'+v.k+' '+v.n+'</span>';
+    h+='<span class="bar"><span class="fill" style="width:'+w+'%;background:'+v.c+'"></span></span>';
+    h+='<span class="ct">'+c+'</span></div>';
+  });
+  el('lv-list').innerHTML=h;
+
+  el('c-dim').style.display='';
+  var h2='';
+  DIM.forEach(function(d2,i){
+    var v=d.dv[d2[0]]||0;
+    h2+='<div class="row"><span class="nm">'+d2[0]+' '+d2[1].slice(0,4)+'</span>';
+    h2+='<span class="bar"><span class="fill" style="width:'+Math.min(100,v)+'%;background:'+COLS[i]+'"></span></span>';
+    h2+='<span class="vv">'+v.toFixed(1)+'</span></div>';
+  });
+  el('dim-list').innerHTML=h2;
+
+  el('c-tb').style.display='';
+  var rows=d.recent.slice(0,40), h3='';
+  rows.forEach(function(r){
+    h3+='<tr><td>'+fmt(r.ts)+'</td><td>'+(r.l||'-')+'</td><td>'+(r.t||0)+'</td>';
+    h3+='<td>'+(r.P||0)+'</td><td>'+(r.E||0)+'</td><td>'+(r.C||0)+'</td><td>'+(r.M||0)+'</td><td>'+(r.R||0)+'</td></tr>';
+  });
+  el('tb-body').innerHTML=h3;
+  el('tb-more').textContent = d.recent.length>40 ? ('仅显示最近 40 条，共 '+n+' 份；完整明细请在 COS 控制台下载 results/ 目录。') : ('共 '+n+' 份。');
+}
+
+function csvCell(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+function exportCSV(){
+  var d=compute();
+  if(!d){ alert('暂无数据'); return; }
+  var head=['提交时间','等级','总分','P拟人化','E情感强度','C交互持续性','M关系商业化','R现实高风险'];
+  var lines=[head.join(',')];
+  d.recent.forEach(function(r){
+    lines.push([r.ts,r.l,r.t,r.P,r.E,r.C,r.M,r.R].map(csvCell).join(','));
+  });
+  var blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='情感陪伴AI风险自测_匿名数据_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function copyAll(){
+  var d=compute();
+  if(!d){ alert('暂无数据'); return; }
+  var t=JSON.stringify({mode:MODE,n:d.n,avg:d.avg,level:d.cnt,dim:d.dv,recent:d.recent},null,1);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){alert('已复制 '+d.n+' 份数据的汇总')},function(){alert('复制失败，请改用导出 CSV')});
+  } else { alert('请改用「导出 CSV」'); }
+}
+load();
+</script>
+</body>
+</html>
